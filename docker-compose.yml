@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  app:
+    build: .
+    image: monitr
+    ports:
+      - "8080:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

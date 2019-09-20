@@ -1,0 +1,54 @@
+{
+  "name": "monitr",
+  "version": "1.0.0",
+  "author": "Aaron Roberts <aaronmroberts1@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/lilasquared/monitr/issues"
+  },
+  "description": "React + Dotnet Core Docker Stats",
+  "repository": "https://github.com/lilasquared/monitr.git",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "peerDependencies": {
+    "dotnetify": "^3.4.0",
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0"
+  },
+  "dependencies": {
+    "use-dotnetify": "^2.0.0",
+    "use-force-update": "^1.0.7"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/node": "^12.7.2",
+    "@types/react": "^16.9.1",
+    "@types/react-dom": "^16.8.5",
+    "dotnetify": "^3.4.0",
+    "eslint-plugin-react-hooks": "^1.7.0",
+    "http-proxy-middleware": "^0.19.1",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-scripts": "3.0.1",
+    "typescript": "^3.5.3"
+  }
+}
