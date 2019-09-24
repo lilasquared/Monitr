@@ -3,24 +3,23 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
-using System.Threading;
 using System.Linq;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace Monitr
 {
     public class MonitrService : IHostedService, IDisposable, IObservable<StatsRecord>
     {
         private ICollection<IObserver<StatsRecord>> _observers;
-        private Timer _timer;
+        private System.Timers.Timer _timer;
+        private readonly String _args;
 
         public MonitrService()
         {
+            _timer = new System.Timers.Timer(500);
+            _timer.Elapsed += GenStats;
             _observers = new List<IObserver<StatsRecord>>();
-        }
-
-        private TimerCallback GenStats => (Object state) =>
-        {
             var hash = new Dictionary<String, String>
             {
                 {"Id", ".ID" },
@@ -32,53 +31,55 @@ namespace Monitr
                 {"MemoryPercentage", ".MemPerc" },
                 {"PIDs", ".PIDs" }
             };
-
             var stats = hash.Select(kvp => $"\\\"{kvp.Key}\\\":\\\"{{{{ {kvp.Value }}}}}\\\"");
-            var args = $"stats --no-stream --format \"{{{String.Join(',', stats)}}}\"";
-            var process = new Process
+            _args = $"stats --no-stream --format \"{{{String.Join(',', stats)}}}\"";
+        }
+
+        private void GenStats(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            _timer.Stop();
+            using (var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "docker",
-                    Arguments = args,
+                    Arguments = _args,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 }
-            };
-
-            process.Start();
-            var results = process.StandardOutput.ReadToEnd().Split('\n');
-            process.WaitForExit();
-
-            foreach (var observer in _observers)
+            })
             {
-                observer.OnNext(new StatsRecord
+                process.Start();
+                var results = process.StandardOutput.ReadToEnd().Split('\n');
+                process.WaitForExit();
+
+                foreach (var observer in _observers)
                 {
-                    Stats = JsonConvert.DeserializeObject<IEnumerable<RawStats>>($"[{String.Join(',', results)}]")
-                });
+                    observer.OnNext(new StatsRecord
+                    {
+                        Stats = JsonConvert.DeserializeObject<IEnumerable<RawStats>>($"[{String.Join(',', results)}]")
+                    });
+                }
             }
-        };
+            _timer.Start();
+        }
 
         public void Dispose()
         {
-            _timer = null;
+            _timer.Dispose();
             _observers.Clear();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            foreach (var item in Environment.GetEnvironmentVariable("PATH").Split(";"))
-            {
-                Console.WriteLine(item);
-            }
-            _timer = new Timer(GenStats, null, 0, 500);
+            _timer.Start();
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _timer.Dispose();
+            _timer.Stop();
             return Task.CompletedTask;
         }
 

@@ -19,6 +19,7 @@ namespace Monitr
             services.AddSingleton<IObservable<StatsRecord>>(ctx => ctx.GetService<MonitrService>());
             services.AddSingleton<IHostedService, MonitrService>(ctx => ctx.GetService<MonitrService>());
 
+            services.AddLogging();
             services.AddMemoryCache();
             services.AddSignalR();
             services.AddDotNetify();
